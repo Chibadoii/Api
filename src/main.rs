@@ -1,5 +1,6 @@
+mod mods_and_handlers;
 
-use actix_web::{web, get, App, HttpServer, HttpRequest, HttpResponse, Responder, Error};
+use actix_web::{web, get, App, HttpServer, HttpRequest, HttpResponse, Responder, Error, post};
 use actix_web::web::Bytes;
 use futures::StreamExt;
 use std::fs::{self, File};
@@ -19,6 +20,13 @@ async fn t_serv()-> impl Responder{
     "NO"
 }
 
+async fn api_reqwest(/*mut data: web::Payload*/mut data:String) ->HttpResponse{
+    while let Some(dat) = data.next().await{
+        let snip_filters = dat
+        mods_and_handlers::handler::handler_reqwest().expect("{Error run reqwest}");
+    }
+    HttpResponse::Ok().body("ee")
+}
 async fn upload_image( mut bytes: web::Payload) -> HttpResponse {
     let mut response_str = String::new();
 
@@ -72,6 +80,7 @@ async fn main() -> std::io::Result<()> {
             .service(t_serv)
             .route("/upload", web::post().to(upload_image))
             .route("/hey", web::get().to(we))
+            .route("/api_reqwest", web::post().to(api_reqwest))
             //.route("/download", web::get().to(download_im))
     })
     .bind(("127.0.0.1", 8080))?
