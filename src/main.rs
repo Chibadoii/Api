@@ -90,6 +90,7 @@ async fn main() -> std::io::Result<()> {
             .route("/api_reqwest", web::post().to(api_reqwest))
             //.route("/download", web::get().to(download_im))
     })
+
     .bind(("127.0.0.1", 8080))?
     .run()
     .await
