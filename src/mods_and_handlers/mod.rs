@@ -1,5 +1,6 @@
 pub mod handler{
-use std::collections::HashMap;
+    use std::arch::is_aarch64_feature_detected;
+    use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use actix_web::Responder;
@@ -102,7 +103,8 @@ pub async fn handler_reqwest() -> Result<(), reqwest::Error> {
         println!("{:#?}", deser_response);*/
 
         let text_resp: ResWrapper = response.json().await.expect("err");
-        println!("{:#?}", text_resp);
+        let bo_for_resp = Box::new(text_resp);
+
     } else {
         println!("Err {:?} {}", response.status(), response.text().await.expect("err post error response"));
     }

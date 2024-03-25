@@ -5,6 +5,8 @@ use actix_web::web::Bytes;
 use futures::StreamExt;
 use std::fs::{self, File};
 use std::io::prelude::*;
+//use actix_web::dev::Payload;
+use actix_web::web::Payload;
 
 use image::{DynamicImage, ImageFormat};
 
@@ -15,17 +17,22 @@ use image::{DynamicImage, ImageFormat};
 async fn we()->impl Responder{
     "hello dude"
 }
-#[get("/t_serv")]
+#[get("/")]
 async fn t_serv()-> impl Responder{
-    "NO"
+    "good morning vietnam"
 }
 
-async fn api_reqwest(/*mut data: web::Payload*/mut data:String) ->HttpResponse{
-    while let Some(dat) = data.next().await{
-        let snip_filters = dat
-        mods_and_handlers::handler::handler_reqwest().expect("{Error run reqwest}");
+async fn api_reqwest(/*mut data: web::Payload*/mut data:Payload) ->HttpResponse{
+
+    if let Some(dat) = data.next().await{
+        let snip_filters = data;
+        let data_response = mods_and_handlers::handler::handler_reqwest().expect("{Error run reqwest}");
+        HttpResponse::Ok().json(data_response)
+    }else{
+        HttpResponse::NoContent().body("err")
     }
-    HttpResponse::Ok().body("ee")
+
+
 }
 async fn upload_image( mut bytes: web::Payload) -> HttpResponse {
     let mut response_str = String::new();
