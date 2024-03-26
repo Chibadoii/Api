@@ -4,7 +4,8 @@ pub mod handler{
 use std::fs;
 use std::path::Path;
 use actix_web::Responder;
-use reqwest::Client;
+    use actix_web::test::status_service;
+    use reqwest::{Client, StatusCode};
 use reqwest::header::{HeaderMap, HeaderValue, Keys};
 use serde::{Deserialize, Serialize};
 use serde::ser::Error;
@@ -47,7 +48,7 @@ struct Res{
 }
 
 #[tokio::main]
-pub async fn handler_reqwest() -> Result<(), reqwest::Error> {
+pub async fn handler_reqwest<T>() -> Box<T> {
     ///Create req
     let client = Client::new();
     let url = "https://api-seller.ozon.ru/v2/product/list";
@@ -92,25 +93,17 @@ pub async fn handler_reqwest() -> Result<(), reqwest::Error> {
         .headers(headers.clone())
         .json(&json_data_2)
         .send()
-        .await?;
+        .await.expect("err to post response");
 
     //Обработка ответа
     if response.status().is_success() {
-        //для проверки
-        /*let text_resp = response.text().await.expect("err to text");
-        println!("{}", text_resp);
-        let deser_response: ResWrapper = serde_json::from_str(&*text_resp).expect("");
-        println!("{:#?}", deser_response);*/
-
-        let text_resp: ResWrapper = response.json().await.expect("err");
+/// Десериализация в объект структуры и запаковка в Box
+       /* let text_resp: ResWrapper = response.json().await.expect("err");
         let bo_for_resp = Box::new(text_resp);
-
+         bo_for_resp*/
     } else {
-        println!("Err {:?} {}", response.status(), response.text().await.expect("err post error response"));
+        let empty_box:Box<T> = Box::new(5)
     }
-
-
-    Ok(())
 }}
 
 
